@@ -34,10 +34,15 @@ namespace StatEnumerator
 		{
 			// enumerate stats
 			StreamWriter file = new StreamWriter("GameStats.txt");
-			
+
+            int iCounter = 1;
 			foreach (var statRecord in GameController.Instance.Files.Stats.records)
 			{
-				file.WriteLine(statRecord.Key);
+                string strUserFriendlyName = statRecord.Value.UserFriendlyName;
+                string strCodeName = statRecord.Value.UserFriendlyName.Replace(" ", string.Empty);
+                string strPrettyString = "[Description(\"" + strUserFriendlyName + "\")] " + strCodeName + " = " + iCounter.ToString() + ";";
+                file.WriteLine(strPrettyString);
+                iCounter++;
 			}
 }
 	}
