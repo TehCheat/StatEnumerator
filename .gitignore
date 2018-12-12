@@ -56,8 +56,8 @@ Temporary Items
 # Custom
 config.ini
 %PluginUpdate%
-Delve.dll.config
-Delve.pdb
+StatEnumerator.dll.config
+StatEnumerator.pdb
 ErrorLog.txt
 Antlr4.Runtime.xml
 System.Numerics.Vectors.dll
