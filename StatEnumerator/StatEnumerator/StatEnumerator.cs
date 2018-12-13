@@ -25,25 +25,75 @@ namespace StatEnumerator
 {
 	public class StatEnumerator : BaseSettingsPlugin<StatEnumeratorSettings>
 	{
+        bool bFirstTime;
 		public override void Initialise()
 		{
+            bFirstTime = true;
 			PluginName = "StatEnumerator";
 		}
 
-		public override void Render()
-		{
-			// enumerate stats
-			StreamWriter file = new StreamWriter("GameStats.txt");
+        private Tuple<string, string> ParseRawName(string strRawName)
+        {
+            string strPrettyName = "";
+            string strCodeName = "";
+            // force the first char to be a capital letter
+            bool bNextLetterIsCap = true;
+            foreach (char c in strRawName)
+            {
+                if (char.IsLetter(c))
+                {
+                    if (bNextLetterIsCap)
+                    {
+                        strPrettyName += char.ToUpper(c);
+                    }
+                    else
+                    {
+                        strPrettyName += c;
+                    }
+                    bNextLetterIsCap = false;
+                }
+                else if (c =='%')
+                {
+                    strPrettyName += c;
+                    strCodeName += "Pct";
+                }
+                else if (c == '+')
+                {
+                    strPrettyName += c;
+                    strCodeName += "Pos";
+                }
+                else if (c == '-')
+                {
+                    strPrettyName += c;
+                    strCodeName += "Neg";
+                }
+                else if (c == '_')
+                {
+                    strPrettyName += ' ';
+                    // code name drops the '_' altogether
+                    bNextLetterIsCap = true;
+                }
+            }
+            return new Tuple<string, string>(strPrettyName, strCodeName);
+        }
 
-            int iCounter = 1;
-			foreach (var statRecord in GameController.Instance.Files.Stats.records)
-			{
-                string strUserFriendlyName = statRecord.Value.UserFriendlyName;
-                string strCodeName = statRecord.Value.UserFriendlyName.Replace(" ", string.Empty);
-                string strPrettyString = "[Description(\"" + strUserFriendlyName + "\")] " + strCodeName + " = " + iCounter.ToString() + ";";
-                file.WriteLine(strPrettyString);
-                iCounter++;
-			}
-}
+        public override void Render()
+        {
+            if (bFirstTime)
+            {
+                // enumerate stats
+                StreamWriter file = new StreamWriter("GameStats.txt");
+
+                int iCounter = 1;
+                foreach (var statRecord in GameController.Instance.Files.Stats.records)
+                {
+                    var strStrings = ParseRawName(statRecord.Key);
+                    string strPrettyString = "[Description(\"" + strStrings.Item1 + "\")] " + strStrings.Item2 + " = " + iCounter.ToString() + ";";
+                    file.WriteLine(strPrettyString);
+                    iCounter++;
+                }
+                bFirstTime = false;
+            }
+        }
 	}
 }
