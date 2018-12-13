@@ -40,7 +40,7 @@ namespace StatEnumerator
             bool bNextLetterIsCap = true;
             foreach (char c in strRawName)
             {
-                if (char.IsLetter(c))
+                if (char.IsLetter(c) || char.IsNumber(c))
                 {
                     if (bNextLetterIsCap)
                     {
@@ -72,6 +72,12 @@ namespace StatEnumerator
                     strPrettyName += ' ';
                     // code name drops the '_' altogether
                     bNextLetterIsCap = true;
+                }
+                else
+                {
+                    // TODO: unknown chars need special handling? I don't think this ever gets hit... will test
+                    strPrettyName += c;
+                    strCodeName += c;
                 }
             }
             return new Tuple<string, string>(strPrettyName, strCodeName);
